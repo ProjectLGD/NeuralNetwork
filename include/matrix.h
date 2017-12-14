@@ -19,7 +19,7 @@ public:
     void randomize(double start, double end);
     Matrix transpose();
 
-    vector<double> operator[](int i);
+    vector<double>& operator[](int i);
     Matrix operator*(const Matrix &o);
     Matrix operator*(double d);
     Matrix operator-(const Matrix &o);

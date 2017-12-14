@@ -64,7 +64,10 @@ Matrix Matrix::transpose() {
     return ret_val;
 }
 
-vector<double> Matrix::operator[](int i) {
+// Note to self.
+// This will happily return a copy of your vector if you don't use a ref.
+// Please never do this again.
+vector<double>& Matrix::operator[](int i) {
     return mat[i];
 }
 
@@ -87,7 +90,7 @@ Matrix Matrix::operator*(double d) {
     Matrix ret_val(this->rows, this->cols);
     for (size_t i = 0; i < this->rows; i++) {
         for (size_t j = 0; j < this->cols; j++) {
-            ret_val[i][j] = ret_val[i][j] * d;
+            ret_val[i][j] = this->mat[i][j] * d;
         }
     }
     return ret_val;
@@ -122,7 +125,7 @@ Matrix Matrix::operator+(const Matrix &o) {
 }
 
 
-ostream& operator<< (ostream & out, const Matrix &data) {
+ostream& operator<<(ostream & out, const Matrix &data) {
     for (size_t i = 0; i < data.rows; i++) {
         for (size_t j = 0; j < data.cols; j++) {
             out << data.mat[i][j] << "\t";

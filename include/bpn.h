@@ -28,6 +28,7 @@ public:
     ~BPN();
 
     bool train(unsigned int MAX_RUNS);
+    double guess(Matrix &input_row);
 
     Matrix calculate_output_hidden_layer(Matrix &current_training_input, Matrix &value_m);
     Matrix calculate_output_output_layer(Matrix &output_of_hidden_layer, Matrix &weight_m);

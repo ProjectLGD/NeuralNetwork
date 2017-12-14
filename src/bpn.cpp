@@ -36,7 +36,8 @@ Matrix BPN::calculate_output_hidden_layer(Matrix &current_training_input, Matrix
     Matrix output_of_hidden(size_hidden, 1);
     for (size_t row = 0; row < size_hidden; row++) {
         double val = input_of_hidden[row][0] * -1;
-        output_of_hidden.mat[row][0] = (double)(1 / (1 + pow(val,2)));
+        double end_val = (double)(1 / (1 + exp(val)));
+        output_of_hidden.mat[row][0] = end_val;
     }
     return output_of_hidden;
 }
@@ -48,8 +49,9 @@ Matrix BPN::calculate_output_output_layer(Matrix &output_of_hidden_layer, Matrix
 
     Matrix output_of_output_layer(size_output, 1);
     for (size_t row = 0; row < size_output; row++) {
-        double val = in_of_out[row][0];
-        output_of_output_layer[row][0] = (double)(1 / (1 + pow(val, 2)));
+        double val = in_of_out[row][0] * -1;
+        double end_val = (double)(1 / (1 + exp(val)));
+        output_of_output_layer.mat[row][0] = end_val;
     }
     return output_of_output_layer;
 }
@@ -68,6 +70,7 @@ void BPN::adapt_values_and_weights(Matrix current_training_output, Matrix curren
         deltas[row][0] = delta_i;
     }
 
+
     Matrix why = output_of_hidden_layer * deltas.transpose();
     // TODO: use ETHA and ALPHA
     double ALPHA = 1;
@@ -79,7 +82,7 @@ void BPN::adapt_values_and_weights(Matrix current_training_output, Matrix curren
     Matrix delta_star(size_hidden, 1);
     for (size_t row = 0; row < size_hidden; row++) {
         double hidden_layer_val = output_of_hidden_layer[row][0];
-        double delta = (hidden_layer_error[row][0] - hidden_layer_val) * hidden_layer_val * (1 - hidden_layer_val);
+        double delta = hidden_layer_error[row][0] * hidden_layer_val * (1 - hidden_layer_val);
         delta_star[row][0] = delta;
     }
 
@@ -110,6 +113,9 @@ bool BPN::train(unsigned int MAX_RUNS) {
     double error_output_first, error_output_second, error_diff = EPSILON + 1;
     cout << "Error diff is " << error_diff << endl;
 
+    Matrix new_value_m;
+    Matrix new_weight_m;
+
     while((error_diff > EPSILON) && (runs < MAX_RUNS)) {
         error_diff = 0.0;
 
@@ -122,16 +128,21 @@ bool BPN::train(unsigned int MAX_RUNS) {
             // cout << "Output of hidden layer " << endl << output_of_hidden_layer << endl;
 
             Matrix output_of_output_layer = calculate_output_output_layer(output_of_hidden_layer, matrices.at(1));
+            // cout << "Output of output layer " << endl << output_of_output_layer << endl;
 
             // cout << "Output of outputlayer" << endl;
             // cout << output_of_output_layer << endl;
 
-            Matrix new_value_m;
-            Matrix new_weight_m;
+            // cout << "Pre" << endl;
+			// cout << new_value_m << endl << new_weight_m << endl;
             adapt_values_and_weights(current_training_output, current_training_input, output_of_output_layer, output_of_hidden_layer, new_value_m, new_weight_m);
+
+            // cout << "Post" << endl;
+			// cout << new_value_m << endl << new_weight_m << endl;
+
             // cout << "New values and weights" << endl;
             // cout << new_value_m << endl << new_weight_m << endl;
-            double error_output_first = calculate_output_error(current_training_output, output_of_output_layer);
+            error_output_first = calculate_output_error(current_training_output, output_of_output_layer);
 
             // func
             // II is IT, V1 W1
@@ -139,17 +150,33 @@ bool BPN::train(unsigned int MAX_RUNS) {
             Matrix output_of_output_layer_second = calculate_output_output_layer(output_of_hidden_layer, new_weight_m);
             // use second output_of_output_layer with calculate_output_error
 
-            double error_output_second = calculate_output_error(current_training_output, output_of_output_layer_second);
+            error_output_second = calculate_output_error(current_training_output, output_of_output_layer_second);
 
             error_diff += (error_output_second - error_output_first) * (error_output_second - error_output_first);
             matrices.at(0) = new_value_m;
             matrices.at(1) = new_weight_m;
+            // cout << "--------" << endl;
         }
-        cout << "Error is " << error_diff << endl;
+        cout << "Run: " << runs << " error is " << error_diff << endl;
         runs++;
     }
 
-    return false;
+    return runs < MAX_RUNS;
+}
+
+double BPN::guess(Matrix &input_row) {
+    Matrix output_of_hidden_layer = calculate_output_hidden_layer(input_row, matrices.at(0));
+    Matrix output_of_output_layer = calculate_output_output_layer(output_of_hidden_layer, matrices.at(1));
+    cout << "My guess" << endl;
+    for (size_t i = 0; i < output_of_output_layer.rows; i++) {
+        for (size_t j = 0; j < output_of_output_layer.cols; j++) {
+            double val = output_of_output_layer[i][j];
+            cout << val;
+        }
+        cout << endl;
+    }
+
+    return 0.0f;
 }
 
 ostream& operator<< (ostream & out, const BPN &data) {

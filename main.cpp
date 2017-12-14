@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 	}
 	cout << endl;
 	size_t size_input = 2;
-	size_t size_hidden = 3;
+	size_t size_hidden = 5;
 	size_t size_output = 1;
 
 	// 0 0 		0
@@ -35,7 +35,14 @@ int main(int argc, char** argv) {
 	BPN bpn(input, output, size_hidden);
 	cout << bpn << endl;
 
-	bpn.train(100);
+	bpn.train(10000);
+
+	cout << input << endl;
+
+	for (size_t row = 0; row < input.rows; row++) {
+		Matrix r(input[row], true);
+		bpn.guess(r);
+	}
 
 	return 0;
 }

@@ -25,15 +25,14 @@ public:
     double EPSILON = 1E-10;
 
     BPN(Matrix input, Matrix output, size_t hidden);
-    ~BPN();
 
     bool train(unsigned int MAX_RUNS);
     double guess(Matrix &input_row);
 
     Matrix calculate_output_hidden_layer(Matrix &current_training_input, Matrix &value_m);
     Matrix calculate_output_output_layer(Matrix &output_of_hidden_layer, Matrix &weight_m);
-    void adapt_values_and_weights(Matrix current_training_output, Matrix current_training_input, Matrix output_of_output_layer, Matrix output_of_hidden_layer, Matrix &delta_values, Matrix &delta_weights);
-    double calculate_output_error(Matrix current_training_output, Matrix output_of_output_layer);
+    void adapt_values_and_weights(Matrix &current_training_output, Matrix &current_training_input, Matrix &output_of_output_layer, Matrix &output_of_hidden_layer, Matrix &delta_values, Matrix &delta_weights);
+    double calculate_output_error(Matrix &current_training_output, Matrix &output_of_output_layer);
 
     friend ostream& operator<< (ostream & out, const BPN &data);
 };

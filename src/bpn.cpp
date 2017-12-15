@@ -23,10 +23,6 @@ BPN::BPN(const Matrix input, const Matrix output, size_t hidden) {
     matrices.push_back(delta_weight_m);
 }
 
-BPN::~BPN() {
-
-}
-
 // output of hidden layer
 Matrix BPN::calculate_output_hidden_layer(Matrix &current_training_input, Matrix &value_m) {
     Matrix out_of_in(current_training_input);
@@ -56,7 +52,7 @@ Matrix BPN::calculate_output_output_layer(Matrix &output_of_hidden_layer, Matrix
     return output_of_output_layer;
 }
 
-void BPN::adapt_values_and_weights(Matrix current_training_output, Matrix current_training_input, Matrix output_of_output_layer, Matrix output_of_hidden_layer, Matrix &value_m, Matrix &weight_m) {
+void BPN::adapt_values_and_weights(Matrix &current_training_output, Matrix &current_training_input, Matrix &output_of_output_layer, Matrix &output_of_hidden_layer, Matrix &value_m, Matrix &weight_m) {
 
     // calculate the error between output of training and current_training_output of output_of_output_layer
     Matrix output_layer_error = current_training_output - output_of_output_layer;
@@ -94,7 +90,7 @@ void BPN::adapt_values_and_weights(Matrix current_training_output, Matrix curren
 
 }
 
-double BPN::calculate_output_error(Matrix current_training_output, Matrix output_of_output_layer) {
+double BPN::calculate_output_error(Matrix &current_training_output, Matrix &output_of_output_layer) {
     double err = 0;
     double diff = 0;
     for (size_t row = 0; row < size_output; row++) {
